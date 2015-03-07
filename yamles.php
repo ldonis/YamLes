@@ -36,7 +36,21 @@ Class yamles{
      */
     public static function parser($file, $path = null){
         
+        return self::yamles_parser($file, $path = null);
         
+    }
+    
+    /**
+     * YamLesParser
+     * @param $file: Nombre de archivo .yml
+     * @param $path: Ruta de archivo .yml
+     * ~·~ ~·~ ~·~ ~·~ ~·~ ~·~ ~·~ ~·~ ~·~ ~·~ ~·~ 
+     * @package Front-Controller
+     * @author Luis Gdonis <ldonis.emc2@gmail.com>
+     * @link http://ldonis.com
+     * @since 0.1.0-alpha
+     */    
+    private static function yamles_parser($file, $path = null){
         
         /*
          *	Habilita el debug segun parametrización global,
@@ -109,6 +123,15 @@ Class yamles{
                  */
                 $ymlKey = $value;
                 
+                /*
+                 *  Se retiran caracteres no deseados
+                 */
+                $ymlKey = str_replace(':', '', $ymlKey);
+                
+                /*
+                 *  Se crea el vector principal
+                 *  1er nivel
+                 */
                 $yml[$ymlKey]=array();
 
             }elseif(isset($ymlKey)){
