@@ -1,6 +1,6 @@
 <?php
 /**
- * YamLes
+ * Yamles
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
  * @author Luis Gdonis <ldonis.emc2@gmail.com>
  * @link http://ldonis.com
  * @package YML Parser
- * @version 0.1.0-alpha
+ * @version 0.1.1-beta
  */
 
 Class yamles{
@@ -32,7 +32,7 @@ Class yamles{
      * @package Front-Controller
      * @author Luis Gdonis <ldonis.emc2@gmail.com>
      * @link http://ldonis.com
-     * @since 0.1.0-alpha
+     * @since 0.1.1-beta
      */
     public static function parser($file, $path = null){
         
@@ -48,7 +48,7 @@ Class yamles{
      * @package Front-Controller
      * @author Luis Gdonis <ldonis.emc2@gmail.com>
      * @link http://ldonis.com
-     * @since 0.1.0-alpha
+     * @since 0.1.1-beta
      */    
     private static function yamles_parser($file, $path = null){
         
@@ -64,7 +64,7 @@ Class yamles{
         /*
          *	Validaciones
          */
-        if(!$file || $file == ''){ self::exception(001); }
+        if(!$file || $file == ''){ self::exception(001); return; }
 
         /*
          * Ubica archivo yml
@@ -76,7 +76,7 @@ Class yamles{
         /*
          * Se asegura que el archivo exista
          */
-        if(!file_exists($pathfile)){ self::exception(002); }
+        if(!file_exists($pathfile)){ self::exception(002); return; }
 
         /*
          *	Inicializa variables
@@ -87,16 +87,33 @@ Class yamles{
          *	Obtiene el archivo yml
          */
         $ymlData = file_get_contents($file . ".yml");
-
+        
         /*
          *	Explode por salto de linea
          */
         $ymlData = explode("\n", $ymlData);
-
+        
+        /*
+         *      Se eliminan valores nulos
+         */
+        $ymlData = array_filter($ymlData);
+        
+        /*
+         *      Reordena el indice del vector
+         */
+        $ymlData = array_values($ymlData);
+        
+        /*
+         *      Se eliminan espacios en blanco
+         */
+        //$ymlData = array_map('trim', $ymlData);
+        
         /*
          *  Recorre todas las lineas del archivo,
          *  crea vector hasta de dos niveles
          *  actualmente solo se soporta el siguiente ejemplo:
+         *  nivel-01: texto de nivel 1
+         *  nivel-01: mas texto de nivel 1
          *  nivel-01:
          *      subnivel-01: Texto de subnivel
          *      subnivel-02: Texto de subnivel
@@ -105,62 +122,88 @@ Class yamles{
          *      subnivel-02: Texto de subnivel
          */
         foreach($ymlData as $key => $value){
-
+            
             /*
              * Total de caracteres, por cada linea
-             * key: value
              */
             $len = strlen($value);
             
             /*
-             *  Si en la ultima posicion se encuentra
-             *  unicamente dos puntos, se toma como vector
+             *  Es comentario
+             */
+            if(substr($value,0,2) == '##'){
+                
+                continue;
+                
+            }
+            
+            /*
+             *  Explode current string
+             */
+            $ymlStringParsed = explode(': ', $value);
+
+            /*
+             * Es una cadena unica
+             */
+            if(strpos($value, ': ') && preg_match('/\s\s\s\s/',$value) == 0){
+                
+                $yml[$ymlStringParsed[0]] = $ymlStringParsed[1];
+                
+                continue;
+                
+            }
+            
+            /*
+             *  Es elemento de vector
+             */
+            if(preg_match('/\s\s\s\s/',$value) == 1 && $array){
+                
+                /*
+                 *  Sub valores
+                 *  $array = vector de nivel 1
+                 *  $ymlStringParsed[0] = indice de subnivel
+                 *  $ymlStringParsed[0] = texto de subnivel
+                 */
+                $yml[$array][trim($ymlStringParsed[0])] = $ymlStringParsed[1];
+                
+                continue;
+                
+            }else{
+                
+                $array = false;
+                
+            }
+            
+            /*
+             *  Es indice de vector
              */
             if(substr(trim($value), ($len-1)) == ':'){
-                
-                /*
-                 *  Se crea vector
-                 */
-                $ymlKey = $value;
-                
-                /*
-                 *  Se retiran caracteres no deseados
-                 */
-                $ymlKey = str_replace(':', '', $ymlKey);
-                
-                /*
-                 *  Se crea el vector principal
-                 *  1er nivel
-                 */
-                $yml[$ymlKey]=array();
 
-            }elseif(isset($ymlKey)){
+                /*
+                 *  Elimina los dos puntos del indice
+                 */
+                $ymlStringParsed[0] = str_replace(':', '', $ymlStringParsed[0]);
                 
                 /*
-                 *  Antes de los dos puntos se toma
-                 *  como llave de vector
+                 *  Crea el indice en el vector principal
                  */
-                $ymlsubkey = trim(substr($value, 0,strpos($value, ":")));
+                $yml[$ymlStringParsed[0]] = array();
                 
                 /*
-                 *  Se elimina la llave del vector del
-                 *  string el resto se toma como el valor
+                 *  Indica que los elementos pertenecen a un vector
                  */
-                $ymlsubvalue = trim(str_replace($ymlsubkey.":", '', $value));
+                $array = $ymlStringParsed[0];
                 
-                /*
-                 *  Se asigna el valor al indice actual del subvector
-                 */
-                $yml[$ymlKey][$ymlsubkey] = $ymlsubvalue;
-
+                continue;
+                
             }
-
+            
         }
         
         return $yml;
 
     }
-
+    
     /**
      * Capturador de errores
      * @param int $code Codigo de error
@@ -168,13 +211,17 @@ Class yamles{
      * @package Front-Controller
      * @author Luis Gdonis <ldonis.emc2@gmail.com>
      * @link http://ldonis.com
-     * @since 0.1.0-alpha
+     * @since 0.1.1-beta
      */   
     private static function exception($code){
+
+        if(defined('DEBUG') && (DEBUG == true)){
 
             echo "Error numero: " . $code;
 
             exit();
+
+        }
 
     }
 
