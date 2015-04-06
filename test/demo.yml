@@ -1,7 +1,10 @@
+## Este es un comentario
+github: https://github.com
+license: gpl
 user:
     name: ldonis
     email: ldonis.emc2@gmail.com
     url: http://ldonis.com
 project:
-    name: YamLes
+    name: Yamles
     url: yml.ldonis.com
