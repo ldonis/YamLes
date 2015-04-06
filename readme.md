@@ -6,7 +6,7 @@ Super simple yml parser
 Yamles es una herramienta que permite procesar archivos yaml, retornando un vector PHP
 
 **Descargar**
-[Versión 0.1.1-beta](https://github.com/ldonis/Lesli/archive/v0.1.1-beta.zip)
+[Versión 0.1.1-beta](https://github.com/ldonis/Yamles/archive/0.1.1-beta.zip)
 
 ###Como usar yamles
 ---------------
@@ -18,9 +18,9 @@ Yamles es una herramienta que permite procesar archivos yaml, retornando un vect
 
 Yamles es completamente libre y de codigo abierto
 
-* Sitio web: [http://lesli.ldonis.com](http://lesli.ldonis.com/)
+* Sitio web: [http://yml.ldonis.com](http://yml.ldonis.com/)
 
-* Issue tracker: [https://github.com/ldonis/Lesli/issues](https://github.com/ldonis/Lesli/issues)
+* Issue tracker: [https://github.com/ldonis/Yamles/issues](https://github.com/ldonis/Yamles/issues)
  
 
 ###Licencia
