@@ -1,0 +1,7 @@
+{
+    "name": "ldonis/yamles",
+    "description": "Super simple yml parser",
+    "require": {
+        "php": ">=5.3.0",
+    }
+}
