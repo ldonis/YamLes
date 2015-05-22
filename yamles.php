@@ -23,6 +23,8 @@
 
 Class yamles{
     
+    private static $tab = "/\s\s\s\s/";
+    
     /**
      * Parser
      * @param $file: Nombre de archivo .yml
