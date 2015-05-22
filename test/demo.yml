@@ -1,10 +1,14 @@
-## Este es un comentario
-github: https://github.com
-license: gpl
-user:
-    name: ldonis
-    email: ldonis.emc2@gmail.com
-    url: http://ldonis.com
-project:
-    name: Yamles
-    url: yml.ldonis.com
+##comentario 1
+nivel: uno
+tab: cero espacios
+nivel1:
+    nivel: dos
+    tab: cuatro espacios
+    nivel2:
+        nivel: tres
+        tab: ocho espacios
+        nivel3:
+            nivel: cuatro
+            tab: doce espacios
+otra: otra cadena de nivel 1
+##comentario 2

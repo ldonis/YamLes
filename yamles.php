@@ -18,12 +18,11 @@
  * @author Luis Gdonis <ldonis.emc2@gmail.com>
  * @link http://ldonis.com
  * @package YML Parser
- * @version 0.1.1-beta
+ * @version 0.2.0-beta
  */
 
 Class yamles{
-
-
+    
     /**
      * Parser
      * @param $file: Nombre de archivo .yml
@@ -106,27 +105,16 @@ Class yamles{
         /*
          *      Se eliminan espacios en blanco
          */
-        //$ymlData = array_map('trim', $ymlData);
+        //$ymlData = array_map('trim', $ymlData);    
+        
+        $levels_index = array();
         
         /*
          *  Recorre todas las lineas del archivo,
-         *  crea vector hasta de dos niveles
-         *  actualmente solo se soporta el siguiente ejemplo:
-         *  nivel-01: texto de nivel 1
-         *  nivel-01: mas texto de nivel 1
-         *  nivel-01:
-         *      subnivel-01: Texto de subnivel
-         *      subnivel-02: Texto de subnivel
-         *  nivel-02:
-         *      subnivel-01: Texto de subnivel
-         *      subnivel-02: Texto de subnivel
+         *  identifica el nivel del vector,
+         *  crea indices para cada vector
          */
         foreach($ymlData as $key => $value){
-            
-            /*
-             * Total de caracteres, por cada linea
-             */
-            $len = strlen($value);
             
             /*
              *  Es comentario
@@ -141,11 +129,12 @@ Class yamles{
              *  Explode current string
              */
             $ymlStringParsed = explode(': ', $value);
-
+            
+            
             /*
              * Es una cadena unica
              */
-            if(strpos($value, ': ') && preg_match('/\s\s\s\s/',$value) == 0){
+            if(strpos($value, ': ') && preg_match(self::$tab, $value) == 0){
                 
                 $yml[$ymlStringParsed[0]] = $ymlStringParsed[1];
                 
@@ -154,48 +143,46 @@ Class yamles{
             }
             
             /*
-             *  Es elemento de vector
+             * indice de vector
              */
-            if(preg_match('/\s\s\s\s/',$value) == 1 && $array){
+            if(!isset($ymlStringParsed[1])){
                 
                 /*
-                 *  Sub valores
-                 *  $array = vector de nivel 1
-                 *  $ymlStringParsed[0] = indice de subnivel
-                 *  $ymlStringParsed[0] = texto de subnivel
+                 * Nivel de indices
                  */
-                $yml[$array][trim($ymlStringParsed[0])] = $ymlStringParsed[1];
+                $level = substr_count($value, ' ') / 4;
+                
+                /*
+                 * Nombre de indice
+                 */
+                $value = trim(str_replace(':','',$value));
+                
+                /*
+                 * Arma vector de indice por niveles
+                 */
+                $levels_index[$level] = $value;
                 
                 continue;
-                
-            }else{
-                
-                $array = false;
                 
             }
             
             /*
-             *  Es indice de vector
+             * Elimina espacios en blanco
              */
-            if(substr(trim($value), ($len-1)) == ':'){
-
-                /*
-                 *  Elimina los dos puntos del indice
-                 */
-                $ymlStringParsed[0] = str_replace(':', '', $ymlStringParsed[0]);
+            $ymlStringParsed = $ymlStringParsed = array_map('trim', $ymlStringParsed);
+            
+            switch($level){
+                case 0 : // Vector de nivel 1 -> tab 0 espacios
+                    $yml[$levels_index[0]][$ymlStringParsed[0]] = $ymlStringParsed[1]; 
+                break;
                 
-                /*
-                 *  Crea el indice en el vector principal
-                 */
-                $yml[$ymlStringParsed[0]] = array();
+                case 1 : // Vector de nivel 2 -> tab 4 espacios
+                    $yml[$levels_index[0]][$levels_index[1]][$ymlStringParsed[0]] = $ymlStringParsed[1];
+                break;
                 
-                /*
-                 *  Indica que los elementos pertenecen a un vector
-                 */
-                $array = $ymlStringParsed[0];
-                
-                continue;
-                
+                case 2 : // Vector de nivel 3 -> tab 8 espacios
+                    $yml[$levels_index[0]][$levels_index[1]][$levels_index[2]][$ymlStringParsed[0]] = $ymlStringParsed[1]; 
+                break;
             }
             
         }
