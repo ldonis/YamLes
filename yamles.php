@@ -65,7 +65,7 @@ Class yamles{
         /*
          *	Validaciones
          */
-        if(!$file || $file == ''){ self::exception(001); return; }
+        if(!$file || $file == ''){ return self::exception(001); }
 
         /*
          * Ubica archivo yml
@@ -77,7 +77,7 @@ Class yamles{
         /*
          * Se asegura que el archivo exista
          */
-        if(!file_exists($pathfile)){ self::exception(002); return; }
+        if(!file_exists($pathfile)){ return self::exception(002); }
 
         /*
          *	Inicializa variables
@@ -206,9 +206,7 @@ Class yamles{
 
         if(defined('DEBUG') && (DEBUG == true)){
 
-            echo "Error numero: " . $code;
-
-            exit();
+            return "Error numero: " . $code;
 
         }
 
